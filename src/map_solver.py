@@ -60,6 +60,34 @@ def log_gaussian_prior(theta, mu=0, sigma=1):
     mu: Mean (Equals 0 for easy caculation)
     """
 
-    return - sum((theta - mu)**2) / (2 * sigma**2)
+    return - np.sum((theta - mu)**2) / (2 * sigma**2)
 
 # Linear Regression
+
+def log_linear_likelihood(theta, data, sigma=1.0):
+    """
+    theta: Array [w0, w1, ..., wn] — intercept + weights
+    data : Tuple (X, y)
+             X: 2D array, shape (n_samples, n_features)
+             y: 1D array, shape (n_samples,)
+    sigma: Noise std (assumed known)
+    """
+    X, y = data
+    X = np.array(X)
+    y = np.array(y)
+
+    # Thêm cột 1 vào X để tính bias (w0)
+    X_b = np.column_stack([np.ones(len(X)), X])
+
+    y_pred = X_b @ theta          # ŷ = Xθ
+    residuals = y - y_pred        # e = y - ŷ
+
+    return -np.sum(residuals**2) / (2 * sigma**2)
+
+
+def log_linear_prior(theta, sigma=1.0):
+    """
+    Gaussian prior (Ridge): w ~ N(0, sigma²I)
+    theta: Array [w0, w1, ..., wn]
+    """
+    return -np.sum(theta**2) / (2 * sigma**2)
