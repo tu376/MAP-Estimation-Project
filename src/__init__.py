@@ -7,3 +7,9 @@ from .map_solver import (
     log_linear_likelihood,
     log_linear_prior,
 )
+
+from .optimizer import (
+    GradientDescentOptimizer, 
+    grad_sensor_fusion, 
+    grad_coin_flipping, 
+    grad_ridge_regression)
