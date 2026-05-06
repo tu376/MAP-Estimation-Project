@@ -78,7 +78,7 @@ def plot_comparison(data, theta_mle, theta_map, alpha, beta_prior):
     plt.legend()
 
     # Save into notebooks folder as requested
-    output_dir = os.path.join(project_root, 'notebooks')
+    output_dir = os.path.join(project_root, 'docs','figures')
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, 'ex1_coin_flipping_mle_vs_map.png')
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
