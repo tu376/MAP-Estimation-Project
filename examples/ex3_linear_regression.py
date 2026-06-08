@@ -41,10 +41,6 @@ map_weights = optimizer.minimize(
     sigma=sigma_likeli
 )
 
-for i, col in enumerate(feature_cols):
-    print(f"{col:<20}: {map_weights[i+1]:.6f}")
-
-print("\nĐang chạy MLE (OLS with lambda=0)...")
 initial_w_mle = np.zeros(X_train.shape[1] + 1)
 
 def grad_ols(theta, data, lmbda=0, sigma=sigma_likeli):
@@ -68,24 +64,9 @@ mle_weights = optimizer_mle.minimize(
     sigma=sigma_likeli
 )
 
-for i, col in enumerate(feature_cols):
-    print(f"{col:<20}: {mle_weights[i+1]:.6f}")
-
 prior_mean = np.zeros_like(mle_weights)  # prior Gaussian N(0, sigma_prior^2)
 
-for i, col in enumerate(feature_cols):
-    print(f"{col:<20}: {prior_mean[i+1]:.6f}")
-
 param_names = ['Intercept'] + feature_cols
-
-for i, name in enumerate(param_names):
-    print(f"  {name:20}: {prior_mean[i]:8.4f}")
-
-for i, name in enumerate(param_names):
-    print(f"  {name:20}: {mle_weights[i]:8.4f}")
-
-for i, name in enumerate(param_names):
-    print(f"  {name:20}: {map_weights[i]:8.4f}")
 
 x = np.arange(len(param_names))
 width = 0.25
