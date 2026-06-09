@@ -1,9 +1,9 @@
 import os
 import sys
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import norm
+
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, ".."))
@@ -18,20 +18,24 @@ try:
         GradientDescentOptimizer, 
         grad_sensor_fusion
     )
-    print("--- Internal modules imported successfully ---")
+    from src.utils import load_csv, to_numpy, set_seed
+    print("--- Internal modules & Utils imported successfully ---")
 except ImportError as e:
     print(f"Import Error: {e}")
     sys.exit(1)
 
+set_seed(42)
+
+
 data_path = os.path.join(project_root, 'data', 'sensor_data.csv')
 try:
-    df = pd.read_csv(data_path)
+    df = load_csv(data_path)
     print(f"Dataset loaded: {len(df)} rows found.")
-except FileNotFoundError:
-    print(f"File not found at: {data_path}")
+except FileNotFoundError as e:
+    print(e)
     sys.exit(1)
 
-bias_observations = df.iloc[:, 1:6].values.flatten()
+bias_observations = to_numpy(df.iloc[:, 1:6].values.flatten(), dtype=float)
 
 mu_prior = 0.2       
 sigma_prior = 0.001  
@@ -69,10 +73,9 @@ else:
     print("Logic check complete. Results are stable.")
 
 figure_dir = os.path.join(project_root, 'docs', 'figures')
-
 os.makedirs(figure_dir, exist_ok=True)
 
-x_plot = np.linspace(0.1, 0.6, 1000)
+x_plot = np.linspace(0.1, 0.6, 50000)
 
 y_prior = norm.pdf(x_plot, mu_prior, sigma_prior)
 y_likelihood = norm.pdf(x_plot, mle_result, 0.05) 
