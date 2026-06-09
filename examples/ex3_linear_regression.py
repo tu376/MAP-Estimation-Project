@@ -3,23 +3,18 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Thiết lập hệ thống path
 current_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in locals() else os.getcwd()
 project_root = os.path.abspath(os.path.join(current_dir, ".."))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-# Import từ src
 from src import MAP, log_linear_likelihood, log_linear_prior
 from src import GradientDescentOptimizer, grad_ridge_regression
 
-# Import các hàm tiện ích từ utils của bạn
 from src.utils import set_seed, load_csv, train_test_split, add_bias_column
 
-# 1. KHỞI TẠO RANDOM SEED CỐ ĐỊNH
 set_seed(42)
 
-# 2. ĐỌC DỮ LIỆU SỬ DỤNG UTILS
 data_path = os.path.join(project_root, 'data', 'cleaned_insurance.csv')
 df = load_csv(data_path)
 
@@ -28,19 +23,15 @@ feature_cols = ['age', 'sex', 'bmi', 'children', 'smoker',
 X = df[feature_cols].values
 y = df['charges_log'].values
 
-# 3. CHIA TẬP TRAIN/TEST SỬ DỤNG UTILS
-# (Hàm train_test_split trong utils mặc định xáo trộn dữ liệu qua đối số shuffle=True)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# 4. THIẾT LẬP THAM SỐ MÔ HÌNH
-sigma_likeli = 0.5      # nhiễu của likelihood
-sigma_prior = 0.4       # prior std (điều khiển độ co)
+sigma_likeli = 0.5     
+sigma_prior = 0.4      
 lambda_prior = 1.0 / (sigma_prior**2)
 learning_rate = 1e-5
 epochs = 5000
 
-# 5. TỐI ƯU HÓA MAP (RIDGE REGRESSION)
-initial_w = np.zeros(X_train.shape[1] + 1)   # +1 cho cột intercept/bias
+initial_w = np.zeros(X_train.shape[1] + 1)  
 optimizer = GradientDescentOptimizer(learning_rate=learning_rate, epochs=epochs)
 
 data_tuple = (X_train, y_train)
@@ -52,16 +43,11 @@ map_weights = optimizer.minimize(
     sigma=sigma_likeli
 )
 
-# 6. TỐI ƯU HÓA MLE (ORDINARY LEAST SQUARES)
 initial_w_mle = np.zeros(X_train.shape[1] + 1)
 
 def grad_ols(theta, data, lmbda=0, sigma=sigma_likeli):
-    """
-    Gradient của negative log likelihood (không có prior)
-    Sử dụng hàm add_bias_column từ utils thay vì np.column_stack([np.ones, X])
-    """
     X, y = data 
-    X_b = add_bias_column(X, prepend=True) # Tạo ma trận X mở rộng có cột 1 đứng trước
+    X_b = add_bias_column(X, prepend=True) 
     residuals = X_b @ theta - y
     grad = (X_b.T @ residuals) / (sigma**2)
     return grad
@@ -78,9 +64,6 @@ mle_weights = optimizer_mle.minimize(
 
 prior_mean = np.zeros_like(mle_weights)  
 
-# ==============================================================================
-# 7. TRỰC QUAN HÓA KẾT QUẢ
-# ==============================================================================
 param_names = ['Intercept'] + feature_cols
 
 x = np.arange(len(param_names))
@@ -220,10 +203,6 @@ map_weights = optimizer.minimize(
 initial_w_mle = np.zeros(X_train.shape[1] + 1)
 
 def grad_ols(theta, data, lmbda=0, sigma=sigma_likeli):
-    """
-    Gradient của negative log likelihood (không có prior)
-    tương đương với lambda = 0
-    """
     X, y = data 
     X_b = np.column_stack([np.ones(len(X)), X])
     residuals = X_b @ theta - y
